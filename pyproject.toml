@@ -1,0 +1,70 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "aioinwx"
+version = "0.1.0"
+description = "Asynchronous Python client for the INWX DomRobot JSON-RPC API"
+readme = "README.md"
+requires-python = ">=3.13"
+authors = [{ name = "Xitee1" }]
+keywords = ["inwx", "domrobot", "domains", "asyncio", "aiohttp"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Framework :: AsyncIO",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Typing :: Typed",
+]
+dependencies = [
+    "aiohttp>=3.10",
+    "pyotp>=2.9",
+]
+
+[project.urls]
+Homepage = "https://github.com/Xitee1/aioinwx"
+Issues = "https://github.com/Xitee1/aioinwx/issues"
+
+[dependency-groups]
+dev = [
+    "freezegun>=1.5",
+    "mypy>=1.13",
+    "pytest>=8.3",
+    "pytest-aiohttp>=1.0",
+    "pytest-asyncio>=0.24",
+    "pytest-cov>=6.0",
+    "ruff>=0.8",
+]
+
+[tool.hatch.build.targets.sdist]
+include = ["src/aioinwx", "tests", "README.md"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "B", "UP", "C4", "SIM"]
+
+[tool.ruff.lint.isort]
+force-sort-within-sections = true
+known-first-party = ["aioinwx"]
+combine-as-imports = true
+
+[tool.mypy]
+strict = true
+packages = ["aioinwx"]
+mypy_path = "src"
+
+[[tool.mypy.overrides]]
+module = ["pyotp"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]
+addopts = "--cov=aioinwx --cov-report=term-missing"
