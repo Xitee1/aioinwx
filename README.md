@@ -71,6 +71,7 @@ client of another account.
 
 Timestamps are timezone-aware `datetime` objects. The API returns them as objects like
 `{"scalar": "2027-08-21T20:28:56+00:00", "xmlrpc_type": "datetime", "timestamp": 1818880136}`.
+Fields the API leaves out are `None`.
 
 ## Exceptions
 

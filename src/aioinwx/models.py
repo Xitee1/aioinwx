@@ -22,6 +22,22 @@ def parse_datetime(value: Any) -> datetime | None:
     return parsed
 
 
+def _parse_bool(value: Any) -> bool | None:
+    """Parse an optional boolean value."""
+    if value is None or isinstance(value, bool):
+        return value
+    raise ValueError(f"Invalid boolean value: {value!r}")
+
+
+def _parse_nameservers(value: Any) -> tuple[str, ...] | None:
+    """Parse the optional list of nameservers."""
+    if value is None:
+        return None
+    if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
+        raise ValueError(f"Invalid nameserver list: {value!r}")
+    return tuple(value)
+
+
 @dataclass(frozen=True, slots=True)
 class InwxAccount:
     """Account returned by the login."""
@@ -69,6 +85,8 @@ class InwxDomain:
     period: str | None
     renewal_date: datetime | None
     expiration_date: datetime | None
+    transfer_lock: bool | None
+    nameservers: tuple[str, ...] | None
 
     @classmethod
     def from_api(cls, data: dict[str, Any]) -> Self:
@@ -82,6 +100,8 @@ class InwxDomain:
             period=data.get("period"),
             renewal_date=parse_datetime(data.get("reDate")),
             expiration_date=parse_datetime(data.get("exDate")),
+            transfer_lock=_parse_bool(data.get("transferLock")),
+            nameservers=_parse_nameservers(data.get("ns")),
         )
 
 

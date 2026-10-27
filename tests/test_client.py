@@ -58,6 +58,7 @@ DOMAIN_ENTRY = {
     "status": "OK",
     "renewalMode": "AUTORENEW",
     "transferLock": True,
+    "ns": ["ns.example.com", "ns2.example.com"],
     "crDate": date_time("2026-08-22T20:28:56+00:00", 1787430536),
     "upDate": date_time("2026-08-22T20:44:56+00:00", 1787431496),
     "reDate": date_time("2027-08-21T20:28:56+00:00", 1818880136),
@@ -72,6 +73,8 @@ DOMAIN = InwxDomain(
     period="1Y",
     renewal_date=datetime(2027, 8, 21, 20, 28, 56, tzinfo=UTC),
     expiration_date=datetime(2027, 8, 22, 20, 28, 56, tzinfo=UTC),
+    transfer_lock=True,
+    nameservers=("ns.example.com", "ns2.example.com"),
 )
 PRICE_ENTRY = {
     "premium": 0,
@@ -303,6 +306,8 @@ async def test_get_domains_with_pages(fake_api: FakeApi, make_client: ClientFact
     assert domains[1].name_ace == "xn--mller-kva.de"
     assert domains[1].renewal_date is None
     assert domains[1].expiration_date is None
+    assert domains[1].transfer_lock is None
+    assert domains[1].nameservers is None
 
 
 async def test_get_domains_empty(fake_api: FakeApi, make_client: ClientFactory) -> None:
@@ -322,6 +327,9 @@ async def test_get_domains_empty(fake_api: FakeApi, make_client: ClientFactory) 
         {"count": 1, "domain": [{**DOMAIN_ENTRY, "exDate": {"timestamp": 1818966536}}]},
         {"count": 1, "domain": [{**DOMAIN_ENTRY, "exDate": date_time("2027-08-22", 0)}]},
         {"count": 1, "domain": [{**DOMAIN_ENTRY, "exDate": date_time("invalid", 0)}]},
+        {"count": 1, "domain": [{**DOMAIN_ENTRY, "transferLock": 1}]},
+        {"count": 1, "domain": [{**DOMAIN_ENTRY, "ns": "ns.example.com"}]},
+        {"count": 1, "domain": [{**DOMAIN_ENTRY, "ns": [None]}]},
     ],
 )
 async def test_get_domains_invalid(
@@ -359,6 +367,8 @@ async def test_get_renewal_price_without_period(
         period=None,
         renewal_date=None,
         expiration_date=None,
+        transfer_lock=None,
+        nameservers=None,
     )
 
     await make_client().get_renewal_price(domain)
